@@ -21,9 +21,11 @@ format and discovery mechanism.
 
 Set configuration in the environment where the skill code runs:
 
-- `OBSIDIAN_VAULT_PATH`: root directory of the Obsidian vault used by `vault-search`.
-- `VAULT_SEARCH_SCRIPT`: path to the separately installed `vault_search.py` catalog CLI described by
-  the `vault-search` skill guide.
+- `VAULT_SEARCH_SCRIPT`: path to the bundled `skills/vault-search/vault_search.py` after installing
+  the skill.
+- `VAULT_SEARCH_VAULT`: root directory of the Obsidian vault used by the catalog CLI.
+- `VAULT_SEARCH_CONFIG`: optional path to a JSON configuration file; alternatively, place
+  `vault_search.json` beside the script.
 - `REPOSITORIES_ROOT`: directory containing local repositories used by `local-repo-fetch`.
 - `SCRATCHPAD_WORKSPACE`: parent directory containing `Scratchpad/` and `Lessons Learned/` for
   `scratchpad-maintenance`.
