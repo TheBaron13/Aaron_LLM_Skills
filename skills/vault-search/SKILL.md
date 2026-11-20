@@ -1,13 +1,15 @@
 ---
 name: vault-search
-description: Search and read an Obsidian vault (notes, PDFs, images) through a catalog tool instead of browsing files. Use whenever you need to find, identify, check the existence of, or read a vault document. Covers search, excerpt, show, list, folders, tags, links, fields, stats, index, doctor, filters, and unusually named files.
-compatibility: Needs Python 3.8+ and a separately installed `vault_search.py` script (standard library only). Set `VAULT_SEARCH_SCRIPT` to its path.
+description: Search and read an Obsidian vault (notes, PDFs, images) through the bundled catalog script instead of browsing files. Use whenever you need to find, identify, check the existence of, or read a vault document. Covers search, excerpt, show, list, folders, tags, links, fields, stats, index, doctor, filters, and unusually named files.
+compatibility: Needs Python 3.8+ and the bundled `vault_search.py` script (standard library for core commands; optional PDF and semantic-search dependencies).
 ---
 
 # Vault search - find things in an Obsidian vault
 
-Set `VAULT_SEARCH_SCRIPT` to the location of the installed `vault_search.py`. Use the shell-specific
-command prefix below; examples omit it, so `search ...` means invoking the script with `search ...`.
+Use the bundled `vault_search.py` in this skill directory. Set `VAULT_SEARCH_SCRIPT` to its installed
+path and `VAULT_SEARCH_VAULT` to the Obsidian vault path, or configure the vault in `vault_search.json`
+beside the script. `VAULT_SEARCH_CONFIG` can point to a config file elsewhere. Without a configured
+vault, the CLI exits with a configuration error. Examples omit the command prefix:
 
 - PowerShell: `python "$env:VAULT_SEARCH_SCRIPT"`
 - Bash or zsh: `python "$VAULT_SEARCH_SCRIPT"`
@@ -16,6 +18,10 @@ command prefix below; examples omit it, so `search ...` means invoking the scrip
 
 Use this tool instead of browsing the vault. It searches a catalog of real notes, PDFs, and images
 and returns only what exists. It never edits the vault.
+
+The script stores its SQLite index outside the vault by default. Search can use a local Ollama
+embedding server; configure `VAULT_SEARCH_EMBED_BACKEND=none` for keyword-only operation. If you
+configure a remote embedding server, note text may be sent to that service.
 
 ## Ground rules (follow every time)
 1. A document exists ONLY if this tool returned it. Never cite, name or quote a note, PDF or image that did not
