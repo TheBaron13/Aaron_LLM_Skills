@@ -1,11 +1,11 @@
 ---
-name: ndbs-recipe-howto
-description: How to save a task that worked as a reusable NDBS recipe skill, so the next request of the same kind starts from working code. Use it only after a task succeeded and the user confirmed the result and agreed to save it.
+name: reusable-revit-recipe
+description: Save a successful Revit task as a reusable skill so similar future requests start from working code. Use only after the task succeeded, the user confirmed the result, and the user agreed to save it.
 ---
 
 # Saving a recipe
 
-A recipe is a small skill holding code that already worked in Revit on this machine.
+A recipe is a small skill holding code that already worked in a Revit project.
 
 ## When to save
 
@@ -19,26 +19,29 @@ element ids.
 
 ## Where and how
 
-Write one file: `%APPDATA%\pyRevit\agent\skills\ndbs-<topic>\SKILL.md`
+Write one `SKILL.md` in the active skill host's documented user-skill directory. Resolve the
+directory and any reload or discovery steps from that host's configuration; do not assume one path
+or command works across installations.
 
-- Folder name: lowercase, hyphens, starts with `ndbs-` (`ndbs-duct-schedule-by-system`).
+- Folder name: lowercase topic words separated by hyphens (for example,
+  `duct-schedule-by-system`).
 - If a recipe for the same job exists, update that file instead of adding a second one.
 
 Use exactly this shape:
 
     ---
-    name: ndbs-<topic>
+    name: <topic>
     description: <what it produces>. Use it for "<how the user phrases the request>" and similar.
     ---
 
     # <Title>
 
-    Verified: <MM/DD/YYYY>, Revit <year>, project "<title>". Confirmed by the user.
+    Verified: <MM/DD/YYYY>, Revit <year>, project <generic or anonymized description>. Confirmed by the user.
 
     ## Inputs
     - <name>: <meaning> (default: <value>)
 
-    ## Script (run_modify, dry_run first)
+    ## Script (use the Revit integration's documented modify operation; dry run first when supported)
     <the exact script that worked, with project-specific values moved into `inputs`>
 
     ## Check before reporting done
@@ -54,5 +57,5 @@ Use exactly this shape:
 - Keep the verification step that proved the result (count, read-back).
 - ASCII only.
 
-After writing the file, tell the user the recipe name and path. New recipes are visible to every MCP
-client through `list_skills` once user skills are enabled (`pyrevit configs agent skills enable`).
+After writing the file, tell the user the recipe name and path. Follow the active skill host's
+documented discovery or reload process before claiming the recipe is available to future sessions.

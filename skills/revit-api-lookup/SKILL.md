@@ -1,32 +1,31 @@
 ---
-name: ndbs-api-lookup
-description: How to find the right Revit or pyRevit API name on this machine instead of guessing. Use it whenever a script fails with AttributeError or "has no attribute", or before using a class, method or BuiltInCategory you have not verified.
+name: revit-api-lookup
+description: Verify Revit and pyRevit API names for the active Revit version instead of guessing. Use after an AttributeError or before using an unverified class, method, or BuiltInCategory.
 ---
 
 # Finding API names without guessing
 
 A wrong API name costs a failed run each time. Look the name up first.
 
-## 1. lookup_revit_api (pyrevit MCP): exact names only
+## 1. Revit-connected API lookup: exact names only
 
-It reads the running Revit, so the answer is right for this Revit year.
+When the Revit integration provides an API lookup tool, prefer it because it can reflect the running
+Revit version.
 
 - Pass a TYPE or `Type.Member`: `ViewSchedule`, `ViewSchedule.CreateSchedule`, `ScheduleFilter`,
   `BuiltInCategory.OST_MEPSpaces`.
 - A bare method name (`CreateSchedule`), a phrase (`Schedule for Space`) or a plural (`Spaces`)
-  returns `found: false`. That does not mean the API is missing; it means the query was not a type.
-- When `found` is false, read the `suggestions` list and retry with a full type name.
+  may be ambiguous. Retry with a type-qualified member name before concluding the API is missing.
 
-## 2. Keyword search: the docs servers
+## 2. Keyword search: API documentation
 
-When you do not know the type name, use the API docs MCP servers if they are connected:
+When you do not know the type name, search the available Revit API and pyRevit documentation sources:
 
-- `revit-api-docs`: `search` (keywords), `get_type`, `get_member`, `verify` (does this member exist in
-  this Revit year), `diff_member` (differences between years), `list_versions`.
-- `pyrevit-api-docs`: search of the pyRevit library documentation.
+- Search by keywords, then inspect the type or member and verify it against the target Revit year.
+- For pyRevit helpers, consult the pyRevit library documentation.
 
 Search with a noun and a verb (`schedule create`, `space level`), then confirm the exact member with
-`lookup_revit_api` or `verify`.
+the connected API lookup tool or the version-matched documentation.
 
 ## 3. Names that are often guessed wrong
 
@@ -51,4 +50,4 @@ Search with a noun and a verb (`schedule create`, `space level`), then confirm t
 ## 4. Level names
 
 Levels are named by the project, not by Revit: "Level 3" may be `L3`, `03`, `LEVEL 3 - T.O. SLAB`.
-Read the level list from `get_context` and match the user's wording to a real level name before filtering.
+Inspect the active model's level names and match the user's wording to a real level name before filtering.
