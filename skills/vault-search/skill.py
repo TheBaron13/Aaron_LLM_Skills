@@ -1,32 +1,38 @@
 import os
 from pathlib import Path
-from ndbs_pi.client import Client
-
-VAULT_ROOT = Path("C:/Users/aaronl/Obsidian")
 
 def vault_search(query: str):
-    results = []
-    # Search all markdown files in the vault
-    if not VAULT_ROOT.exists():
-        return "Error: Obsidian Vault directory not found at " + str(VAULT_ROOT)
+    vault_path = os.environ.get("OBSIDIAN_VAULT_PATH")
+    if not vault_path:
+        return "Error: Set OBSIDIAN_VAULT_PATH to the Obsidian vault directory."
 
-    for path in VAULT_ROOT.rglob("*.md"):
+    vault_root = Path(vault_path).expanduser()
+    if not vault_root.is_dir():
+        return "Error: Obsidian vault directory not found: " + str(vault_root)
+
+    results = []
+    errors = []
+
+    for path in vault_root.rglob("*.md"):
         try:
-            # Skip files in .cache, .git, or similar hidden dirs
-            if any(part.startswith('.') for part in path.parts):
+            if any(part.startswith('.') for part in path.relative_to(vault_root).parts):
                 continue
                 
-            content = path.read_text(encoding="utf-8")
+            content = path.read_text(encoding="utf-8", errors="replace")
             if query.lower() in content.lower():
-                # Return file name and a snippet around the match
-                results.append(f"File: {path.name}\nSnippet: {content[max(0, content.lower().find(query.lower())-50) : content.lower().find(query.lower())+50].strip()}")
-        except Exception as e:
-            continue
+                match_at = content.lower().find(query.lower())
+                results.append(f"File: {path.name}\nSnippet: {content[max(0, match_at-50) : match_at+50].strip()}")
+        except OSError as e:
+            errors.append(f"{path}: {e}")
             
     if not results:
-        return f"No results found for query: '{query}'"
+        message = f"No results found for query: '{query}'"
+    else:
+        message = "\n\n---\n\n".join(results)
     
-    return "\n\n---\n\n".join(results)
+    if errors:
+        message += "\n\nFiles that could not be read:\n" + "\n".join(errors)
+    return message
 
 def run_skill(command: str, args: list = None):
     if command == "search":

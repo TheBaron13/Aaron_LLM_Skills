@@ -1,27 +1,33 @@
 ---
-name: ndbs-space-schedule-by-level
-description: Creates a schedule of MEP Spaces filtered to one level (Number, Name, Level, Area), sorted by number. Use it for "make a schedule of the Level 3 spaces", "space schedule for only L2" and similar. Also the pattern for any single-category schedule filtered by level.
+name: space-schedule-by-level
+description: Creates a Revit schedule of MEP Spaces filtered to one level (Number, Name, Level, Area), sorted by number. Use it for requests like "make a schedule of the Level 3 spaces" or "space schedule for only L2", and as a pattern for other single-category schedules filtered by level.
 ---
 
 # Space schedule for one level
 
-Verified: 11/16/2026, Revit 2025, project "Snowdon Towers Sample HVAC" (dry run by Claude: 10 spaces
-on L3, 10 schedule rows). Not yet confirmed by the user.
+Pattern recorded from a Revit 2025 dry run. Verify the result against the target model before relying on its counts.
 
 ## Inputs
-- level: the level NAME exactly as the project spells it (default: "L3"). Read the level names from
-  `get_context` first; "Level 3" in a request may be `L3` or `03` in the model.
+- level: the level NAME exactly as the project spells it (required). Inspect the active model's levels;
+  "Level 3" in a request may be `L3` or `03`. If the request does not identify a single level, ask
+  which level to use.
 - name: schedule name (default: "Spaces - " + level)
 
-Pass them as the `inputs` object of `run_modify`, for example `{"level": "L3"}`.
+Pass these values through the active Revit integration's documented input mechanism. The example
+expects `inputs` to be a dictionary and `doc` to be the active Revit document; bind those to the
+equivalent host-provided values. Run through the host's supported document-modification workflow,
+using a dry run first when available.
 
-## Script (run_modify, dry_run first)
+## Script (Revit modification; dry run first when available)
 
 ```python
 from pyrevit.api import DB
 
-LEVEL_NAME = inputs.get("level", "L3")
-SCHEDULE_NAME = inputs.get("name", "Spaces - " + LEVEL_NAME)
+LEVEL_NAME = inputs.get("level")
+if not LEVEL_NAME:
+    names = sorted(l.Name for l in DB.FilteredElementCollector(doc).OfClass(DB.Level))
+    raise Exception("Specify a level. Available levels: %s" % names)
+SCHEDULE_NAME = inputs.get("name") or "Spaces - " + LEVEL_NAME
 WANTED = ["Number", "Name", "Level", "Area"]
 
 level = None
